@@ -242,10 +242,16 @@ class TSPSolver:
 		pop_from_q = True
 		round_robin = True
 
+		bssf_cost = np.inf
 		# Use greedy to get intial BSSF.
-		while bssf_cost == np.inf:
-			bssf_path, bssf_cost = self.greedy_run(start=np.random.randint(0,len(cities)-1))
-			bssf_time = time.time() - time1
+		bssf_path = []
+		for i in range(len(cities)):
+			path, cost = self.greedy_run(start=np.random.randint(0,len(cities)-1))
+			if cost < bssf_cost:
+				bssf_time = time.time() - time1
+				bssf_cost = cost
+				bssf_path = path.copy()
+
 
 		bssf_path = TSPSolution(bssf_path[:-1])
 		bssf_cost = bssf_path.cost
@@ -353,6 +359,7 @@ class TSPSolver:
 		# print(len(q))
 		# print(1 - len(cities) * 10/loop_itr)
 		print("Running Time {}".format(time.time() - time1))
+		print(bssf_cost / greedy_cost)
 		results = {}
 		results['cost'] = bssf_path.cost
 		results['time'] = bssf_time
@@ -442,7 +449,7 @@ class TSPSolver:
 		bssf_city_list = bssf_path[:-1]
 		bssf_path = TSPSolution(bssf_path[:-1])
 		bssf_cost = bssf_path.cost
-
+		greedy_cost = bssf_cost
 		print("Greedy: {}".format(bssf_cost))
 
 		population_count = 0
@@ -491,6 +498,7 @@ class TSPSolver:
 
 
 		results = {}
+		print(bssf_cost / greedy_cost)
 		bssf_path = TSPSolution(bssf_city_list)
 		results['cost'] = bssf_path.cost
 		results['time'] = bssf_time
