@@ -91,7 +91,7 @@ class Run:
 
 if __name__ == '__main__':
     # Alg_idx: 0 -> Random, 1 -> Greedy, 2 -> Branch and Bound, 3 -> Fancy
-    size_list = [15,30,60,100,150,200, 205, 210,220,250,300]
+    size_list = [15,30,60,100,150,200, 205, 210, 220, 230, 250,300, 500]
     seed_list = [1,2,3,4,5]
 
 
@@ -125,16 +125,16 @@ if __name__ == '__main__':
 
     for i in size_list:
         for j in seed_list:
-            t.generateNetwork(i, j, 300, 0)
+            t.generateNetwork(i, j, 360, 0)
             rndom.append(t.solveClicked())
 
-            t.generateNetwork(i, j, 300, 1)
+            t.generateNetwork(i, j, 360, 1)
             greedy.append(t.solveClicked())
 
-            t.generateNetwork(i, j, 300, 2)
+            t.generateNetwork(i, j, 360, 2)
             bb.append(t.solveClicked())
 
-            t.generateNetwork(i, j, 300, 3)
+            t.generateNetwork(i, j, 360, 3)
             fancy.append(t.solveClicked())
 
         rndom_cost = 0
