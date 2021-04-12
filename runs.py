@@ -97,8 +97,6 @@ if __name__ == '__main__':
     seed_list = [276]
     if rerun:
 
-
-
         t = Run()
         fancy = []
         bb = []
