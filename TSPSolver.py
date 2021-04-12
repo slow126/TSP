@@ -150,18 +150,22 @@ class TSPSolver:
 		bssf = []
 		bssf_cost = np.inf
 		count = 0
+		cities = self._scenario.getCities()
 		results = {}
 		# Run the greedy run for the time allowance
 		while(time.time() - time1 < time_allowance):
-			path, cost = self.greedy_run(start=np.random.randint(0, self.dist_array.shape[0] - 1))
-			if cost < bssf_cost:
-				# Save the best solution information.
-				bssf_cost = cost
-				bssf_time = time.time() - time1
-				bssf = path
 
-			if cost < np.inf:
-				count += 1
+			for i in range(len(cities) - 1):
+				path, cost = self.greedy_run(start=i)
+				if cost < bssf_cost:
+					# Save the best solution information.
+					bssf_cost = cost
+					bssf_time = time.time() - time1
+					bssf = path
+
+				if cost < np.inf:
+					count += 1
+			break
 		# Return out the required parameters.
 		bssf_sol = TSPSolution(bssf[:-1])
 		results['cost'] = bssf_sol.cost
@@ -319,6 +323,7 @@ class TSPSolver:
 			# Get each edge.
 			for i in range(tmp_dist_array.shape[0]):
 				# Make sure edge isn't already in path.
+
 				if i not in new_path:
 					path_cost = dist_array[new_path[-1],i]
 					tmp_dist_array[new_path[-1], :] += 1
@@ -455,9 +460,9 @@ class TSPSolver:
 				bssf_path = path.copy()
 				bssf_cost = greedy_sol.cost
 				bssf_time = time.time() - time1
+				greedy_time = bssf_time
 
-
-
+		print("Greedy Time: {}".format(greedy_time))
 		bssf_city_list = bssf_path[:-1]
 		bssf_path = TSPSolution(bssf_path[:-1])
 		bssf_cost = bssf_path.cost
@@ -514,6 +519,7 @@ class TSPSolver:
 												   population_length)
 						print("Total Time: {}".format(
 							time.time() - time1))
+						print("BSSF Time: {}".format(bssf_time))
 						return results
 
 
@@ -522,11 +528,12 @@ class TSPSolver:
 			zipped_cities = zip(population_cost, np.arange(len(population)) ,population)
 			sorted_pairs = sorted(zipped_cities)
 
-			selection = np.random.normal(0, len(population) / 3, size=(1, len(cities)))
-			selection = np.abs(selection)
-			selection[selection > (len(sorted_pairs)-1)] = len(sorted_pairs) - 1
-			selection = np.array(selection, int)
-			selection = selection.squeeze()
+			# selection = np.random.normal(0, len(population) / 3, size=(1, len(cities)))
+			# selection = np.abs(selection)
+			# selection[selection > (len(sorted_pairs)-1)] = len(sorted_pairs) - 1
+			# selection = np.array(selection, int)
+			# selection = selection.squeeze()
+			selection = np.random.random_integers(len(cities), len(population)-1, len(cities))
 			population_length = len(population)
 			population = []
 			population_cost = []
@@ -542,8 +549,7 @@ class TSPSolver:
 
 		results = {}
 		population_length = len(population)
-		print(bssf_cost / greedy_cost)
-		print("Total Time: {}".format(time.time() - time1))
+
 		bssf_path = TSPSolution(bssf_city_list)
 		results['cost'] = bssf_path.cost
 		results['time'] = bssf_time
