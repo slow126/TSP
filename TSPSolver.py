@@ -396,7 +396,7 @@ class TSPSolver:
 			if city not in child:
 				child.append(city)
 
-		if np.random.random() < 0.05:
+		if np.random.random() < 0.10:
 			child = self.mutate(child)
 
 		return child
@@ -415,7 +415,17 @@ class TSPSolver:
 		return solution
 
 
-
+	def make_Return(self, bssf_cost, greedy_cost, bssf_city_list, bssf_time, count, population_length):
+		results = {}
+		bssf_path = TSPSolution(bssf_city_list)
+		results['cost'] = bssf_path.cost
+		results['time'] = bssf_time
+		results['count'] = count
+		results['soln'] = bssf_path
+		results['max'] = population_length
+		results['total'] = 0
+		results['pruned'] = 0
+		return results
 		
 	def fancy( self,time_allowance=60.0 ):
 		# Initialize variables and start timer.
@@ -446,36 +456,67 @@ class TSPSolver:
 				bssf_cost = greedy_sol.cost
 				bssf_time = time.time() - time1
 
+
+
 		bssf_city_list = bssf_path[:-1]
 		bssf_path = TSPSolution(bssf_path[:-1])
 		bssf_cost = bssf_path.cost
 		greedy_cost = bssf_cost
 		print("Greedy: {}".format(bssf_cost))
 
+		# bssf_path = []
+		# for city in cities:
+		# 	bssf_path += [city]
+		# bssf_path += [cities[0]]
+		# bssf_city_list = bssf_path[:-1]
+		# bssf_path = TSPSolution(bssf_path[:-1])
+		# bssf_cost = bssf_path.cost
+		# greedy_cost = bssf_cost
+		# print("Junk: {}".format(bssf_cost))
+
+
 		population_count = 0
 
 		count = 0
 
 
+
 		while time.time() - time1 < time_allowance:
 
-			for i in range(len(cities)):
-				while population_count < 20:
+			for i in range(len(cities) - 1):
+				population_cost, _, population = (list(t) for t in
+								zip(*sorted(zip(population_cost, np.arange(len(population)), population))))
+				for j in range(len(population)):
 					# child = self.haveChildren(population[i])
-					child = self.breed(population[i], population[np.random.randint(0, len(population)-1)])
+					child = self.breed(population[i], population[j])
+
+					# child = self.breed(population[i], population[np.random.randint(0, len(population)-1)])
 					child_sol = TSPSolution(child)
 					if child_sol.cost < np.inf:
 						population += [child]
 						population_cost += [child_sol.cost]
 						population_count += 1
 						count += 1
+
 					if child_sol.cost < bssf_cost:
 						bssf_city_list = child
 						bssf_cost = child_sol.cost
 						print("Genetic: {}".format(bssf_cost))
 						bssf_time = time.time() - time1
 
-				population_count = 0
+
+					if time.time() - time1 > time_allowance:
+						print(bssf_cost / greedy_cost)
+						population_length = len(population)
+						results = self.make_Return(bssf_cost, greedy_cost,
+												   bssf_city_list,
+												   bssf_time, count,
+												   population_length)
+						print("Total Time: {}".format(
+							time.time() - time1))
+						return results
+
+
 
 
 			zipped_cities = zip(population_cost, np.arange(len(population)) ,population)
@@ -490,15 +531,19 @@ class TSPSolver:
 			population = []
 			population_cost = []
 
-			for j in range(len(selection)):
+			for j in range(len(cities)):
 				population += [sorted_pairs[j][2]]
+				population_cost += [sorted_pairs[j][0]]
 
-			# for j in selection:
-			# 	population += [sorted_pairs[j][2]]
+			for j in selection:
+				population += [sorted_pairs[j][2]]
+				population_cost += [sorted_pairs[j][0]]
 
 
 		results = {}
+		population_length = len(population)
 		print(bssf_cost / greedy_cost)
+		print("Total Time: {}".format(time.time() - time1))
 		bssf_path = TSPSolution(bssf_city_list)
 		results['cost'] = bssf_path.cost
 		results['time'] = bssf_time
