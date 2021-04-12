@@ -538,7 +538,7 @@ class TSPSolver:
 			# selection[selection > (len(sorted_pairs)-1)] = len(sorted_pairs) - 1
 			# selection = np.array(selection, int)
 			# selection = selection.squeeze()
-			selection = np.random.random_integers(len(cities), len(population)-1, survivor_count)
+			selection = np.random.random_integers(survivor_count, len(population)-1, survivor_count)
 			population_length = len(population)
 			population = []
 			population_cost = []
