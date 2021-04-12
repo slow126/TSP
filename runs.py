@@ -94,8 +94,6 @@ if __name__ == '__main__':
     size_list = [15,30,60,100,150,200, 205, 210,220,250,300]
     seed_list = [1,2,3,4,5]
 
-    size_list = [15,30]
-    seed_list = [1,2]
 
     t = Run()
     fancy = []

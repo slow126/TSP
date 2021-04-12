@@ -407,7 +407,6 @@ class TSPSolver:
 		return child
 
 
-
 	def mutate(self, solution_in):
 		solution = solution_in.copy()
 		city1 = np.random.randint(0, len(solution) - 1)
@@ -431,6 +430,7 @@ class TSPSolver:
 		results['total'] = 0
 		results['pruned'] = 0
 		return results
+
 		
 	def fancy( self,time_allowance=60.0 ):
 		# Initialize variables and start timer.
@@ -487,19 +487,21 @@ class TSPSolver:
 
 
 		while time.time() - time1 < time_allowance:
-
-			for i in range(len(cities) - 1):
+			population_children = []
+			population_cost_children = []
+			for i in reversed(range(len(population) - 1)):
 				population_cost, _, population = (list(t) for t in
 								zip(*sorted(zip(population_cost, np.arange(len(population)), population))))
-				for j in range(len(population)):
+
+				for j in range(len(population) - 1):
 					# child = self.haveChildren(population[i])
 					child = self.breed(population[i], population[j])
 
 					# child = self.breed(population[i], population[np.random.randint(0, len(population)-1)])
 					child_sol = TSPSolution(child)
 					if child_sol.cost < np.inf:
-						population += [child]
-						population_cost += [child_sol.cost]
+						population_children += [child]
+						population_cost_children += [child_sol.cost]
 						population_count += 1
 						count += 1
 
@@ -524,6 +526,9 @@ class TSPSolver:
 
 
 
+			survivor_count = min(len(population)-1, len(cities))
+			population += population_children
+			population_cost += population_cost_children
 
 			zipped_cities = zip(population_cost, np.arange(len(population)) ,population)
 			sorted_pairs = sorted(zipped_cities)
@@ -533,12 +538,12 @@ class TSPSolver:
 			# selection[selection > (len(sorted_pairs)-1)] = len(sorted_pairs) - 1
 			# selection = np.array(selection, int)
 			# selection = selection.squeeze()
-			selection = np.random.random_integers(len(cities), len(population)-1, len(cities))
+			selection = np.random.random_integers(len(cities), len(population)-1, survivor_count)
 			population_length = len(population)
 			population = []
 			population_cost = []
 
-			for j in range(len(cities)):
+			for j in range(survivor_count):
 				population += [sorted_pairs[j][2]]
 				population_cost += [sorted_pairs[j][0]]
 
